@@ -17,7 +17,7 @@ export class AudioBackend {
   async start(workletSource, samples) {
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (!Ctx) { this.mode = 'unsupported'; return false; }
-    this.ctx = new Ctx({ latencyHint: 'interactive' });
+    if (!this.ctx) this.ctx = new Ctx({ latencyHint: 'interactive' });
     if (this.ctx.state === 'suspended') await this.ctx.resume().catch(() => {});
     try {
       if (!this.ctx.audioWorklet || !workletSource) throw new Error('no worklet');
@@ -48,6 +48,18 @@ export class AudioBackend {
     for (const [c, a] of this.pending) this.cmd(c, ...a);
     this.pending = [];
     return true;
+  }
+
+  // iOS only lets an AudioContext start from inside a touch handler, but the sound is built a moment
+  // later. So the first touch creates and resumes the context, and start() picks it up.
+  prime() {
+    if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {}); return; }
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    try {
+      this.ctx = new Ctx({ latencyHint: 'interactive' });
+      this.ctx.resume().catch(() => {});
+    } catch (err) { this.ctx = null; }
   }
 
   cmd(c, ...a) {

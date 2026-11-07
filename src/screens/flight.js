@@ -208,6 +208,8 @@ export class FlightScreen {
     if (press('Minus') || press('PageDown')) { j.afterburner = false; j.throttle = Math.max(0, Math.round(j.throttle * 10) / 10 - 0.1); }
     if (press('Home')) setT(1, true);
     if (press('End')) setT(0);
+    const tt = inp.takeThrottle && inp.takeThrottle(); // the touch slider
+    if (tt) { j.engineOn = true; j.throttle = tt.v; j.afterburner = !!tt.ab && tt.v >= 0.999; }
     const pad = inp.pad;
     if (pad && Math.abs(pad.axes[3] || 0) > 0.2) j.throttle = Math.max(0, Math.min(1, j.throttle - (pad.axes[3] || 0) * 0.02));
   }

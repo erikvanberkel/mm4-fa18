@@ -14,7 +14,7 @@ const fire = (inp) => inp.pressed('Space') || inp.pressed('Enter') || inp.presse
 
 // ---------------------------------------------------------------------------------
 export class BootScreen {
-  constructor(game) { this.game = game; this.t = 0; }
+  constructor(game) { this.game = game; this.t = 0; this.touchUI = 'tap'; }
   update(dt) {
     this.t += dt;
     const inp = this.game.input;
@@ -25,9 +25,9 @@ export class BootScreen {
     bigText(g, 'F/A-18', 88, 70, 3, LOGO_RAMP, { pitch: 24 });
     bigText(g, 'INTERCEPTOR', 28, 102, 3, LOGO_RAMP, { pitch: 24 });
     g.textC(this.game.loadingText || 'A LOVING REMAKE OF THE 1988 AMIGA CLASSIC', 160, 150, C.G7, FONT_SMALL);
-    if (blink(this.t, 1.6)) g.textC('PRESS ANY KEY', 160, 190, C.WHITE, MENU_FONT);
+    if (blink(this.t, 1.6)) g.textC(this.game.touchMode ? 'TAP TO START' : 'PRESS ANY KEY', 160, 190, C.WHITE, MENU_FONT);
     g.textC('TURN YOUR SPEAKERS UP', 160, 214, C.G5, FONT_SMALL);
-    g.textC('DROP A SOUND FILE HERE TO USE YOUR OWN TITLE MUSIC', 160, 232, C.G4, FONT_SMALL);
+    if (!this.game.touchMode) g.textC('DROP A SOUND FILE HERE TO USE YOUR OWN TITLE MUSIC', 160, 232, C.G4, FONT_SMALL);
   }
 }
 
@@ -76,6 +76,11 @@ export class MenuScreen {
     }
   }
   say(text) { this.notice = text; this.noticeT = 3.2; this.game.sfx.ui('back'); }
+  // A tap on a menu line picks it (touch screens).
+  tap(x, y) {
+    for (const it of MENU_ITEMS) if (y >= it.y - 4 && y < it.y + 12) return 'Digit' + it.n;
+    return null;
+  }
   render(g) {
     g.clear(C.BLACK);
     g.textC('F/A-18 INTERCEPTOR', 160, 2, C.BLUE_T, MENU_FONT);
@@ -249,7 +254,7 @@ export class BriefingScreen {
 // ---------------------------------------------------------------------------------
 // A short fake floppy load: the head steps, the motor whirrs, then the flight begins.
 export class LoadingScreen {
-  constructor(game, spec) { this.game = game; this.spec = spec; this.t = 0; this.track = 0; this.next = 0.2; this.done = false; }
+  constructor(game, spec) { this.game = game; this.spec = spec; this.touchUI = 'none'; this.t = 0; this.track = 0; this.next = 0.2; this.done = false; }
   enter() { this.game.sfx.silence(); this.game.sfx.floppyStart(); this.game.sfx.ui('insert'); }
   update(dt) {
     this.t += dt;

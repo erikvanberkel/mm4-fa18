@@ -13,6 +13,7 @@ npm run build      # dist/index.html + dist/game.js, and dist/fa18-interceptor.h
 npm test           # audio, flight model, missions, camera handedness, scaling, input fuzzing
 npm run verify:display   # headless Chrome check that no pixel is ever interpolated
 npm run verify:music     # headless Chrome check of the title music through the real audio path
+npm run verify:touch     # headless Chrome check of the touch controls with emulated fingers
 ```
 
 `dist/fa18-interceptor.html` is a single self-contained file: put it on any static web server. (Opening it directly from disk should work in Chrome too, but I could only verify it over http. If the browser refuses audio worklets there, the game falls back to a slower audio path.) Turn the sound up. Browsers only start audio after a key press, so the first screen waits for one.
@@ -55,6 +56,14 @@ The keys follow the original manual. Alternates are there for keyboards without 
 | `[` and `]` | Zoom |
 | Keypad 4 6 2 1 7 8 | Look left, right, back, down, up, forward (5 locks the head). In chase view they choose the camera angle. Q and E also look or orbit |
 | P, Esc, Shift-Esc | Pause, restart the flight, back to the menu |
+
+### Touch screens
+
+Phones and tablets work. Touch the screen once and the controls appear on top of the game (they stay hidden on a desktop, and hide again when you press a key). The picture itself is never changed.
+
+In flight: put a finger anywhere on the left half and drag for a floating stick (pull down to climb, like a real stick). `<` `>` are the rudder, BRK the brake. The slider on the right is the throttle, AB the afterburner. FIRE (hold it for the cannon), WPN, TGT, GEAR, HOOK, FLARE and CHAFF do what their keys do, and you can use several at once. `II` pauses, `FULL` goes fullscreen (not on iPhone), and `...` opens a drawer with HUD, MAP, RADAR, views, zoom, look, ECM, pod, help, restart and menu. EJECT, RESTART and MENU ask for a second tap. In menus a number pad appears, and tapping a menu line picks it. Landscape is best. On iPhone, the ringer switch mutes web audio.
+
+`npm run verify:touch` drives headless Chrome with emulated fingers at six phone and tablet sizes.
 
 Basic gamepad support is included but has not been tried on real hardware: stick to fly, triggers for rudder, A fire, B weapon, X target, Y view, bumpers for gear and hook.
 

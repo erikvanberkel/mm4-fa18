@@ -9,6 +9,7 @@ import { SceneRenderer } from './render/scene.js';
 import { MapView } from './ui/map.js';
 import { FlightLog } from './log.js';
 import { Game } from './game.js';
+import { Touch } from './touch.js';
 
 const canvas = document.getElementById('screen');
 const display = new Display(canvas);
@@ -23,6 +24,8 @@ const log = new FlightLog();
 const input = new Input(window);
 const game = new Game({ gfx, display, input, world, models, scene, map, log });
 window.__game = game; // handy for debugging in the console
+const touch = new Touch({ game, input, display, canvas }); // finger controls; invisible until the first touch
+window.__touch = touch;
 import('./sim/ai.js').then((m) => { window.__ai = m; });
 
 // The whole picture, 3D view and instruments alike, is one native 320x256 PAL screen. The display scales it up.
@@ -56,6 +59,7 @@ let last = performance.now();
 function loop(now) {
   const dt = Math.min(0.1, (now - last) / 1000);
   last = now;
+  touch.update();
   game.frame(dt);
   requestAnimationFrame(loop);
 }

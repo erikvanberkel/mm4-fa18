@@ -21,6 +21,9 @@ export class Input {
     this.stick = { pitch: 0, roll: 0, rudder: 0 };
     this.invertY = false;
     this.pad = null;
+    this.touchStick = { active: false, pitch: 0, roll: 0 }; // set by the touch layer (src/touch.js)
+    this._thr = null;
+    this._vshift = false;
     this.listeners = [];
     this.lastKey = null;
     el.addEventListener('keydown', (e) => {
@@ -47,7 +50,23 @@ export class Input {
   // True once per physical key press.
   pressed(code) { return this.edge.has(code); }
   held(code) { return this.down.has(code); }
-  endFrame() { this.edge.clear(); }
+  endFrame() {
+    this.edge.clear();
+    if (this._vshift) { this.shift = false; this._vshift = false; }
+  }
+
+  // Virtual keys from the touch layer. They look exactly like keyboard presses to the screens.
+  vpress(code, shift = false) {
+    this.down.add(code);
+    this.edge.add(code);
+    if (shift) { this.shift = true; this._vshift = true; }
+    this.lastKey = { code, key: code, shift };
+    for (const l of this.listeners) l(code, {});
+  }
+  vrelease(code) { this.down.delete(code); }
+  // A throttle position set by the touch slider (0..1), consumed by the flight screen.
+  setThrottle(v, ab = false) { this._thr = { v, ab }; }
+  takeThrottle() { const t = this._thr; this._thr = null; return t; }
 
   // Smooths the digital keys into a stick, like a centring joystick.
   axes(dt) {
@@ -72,8 +91,15 @@ export class Input {
       const d = t - v;
       return Math.abs(d) <= rate * dt ? t : v + Math.sign(d) * rate * dt;
     };
-    s.pitch = pad ? pad.pitch : approach(s.pitch, pitch, 3.2, 5);
-    s.roll = pad ? pad.roll : approach(s.roll, roll, 4.5, 7);
+    const ts = this.touchStick;
+    if (ts.active) {
+      // A finger on the stick is analog. Roll is capped a little below the pad's full range.
+      s.pitch = this.invertY ? -ts.pitch : ts.pitch;
+      s.roll = ts.roll * 0.85;
+    } else {
+      s.pitch = pad ? pad.pitch : approach(s.pitch, pitch, 3.2, 5);
+      s.roll = pad ? pad.roll : approach(s.roll, roll, 4.5, 7);
+    }
     s.rudder = approach(s.rudder, pad && pad.rudder ? pad.rudder : rudder, 4, 6);
     return s;
   }

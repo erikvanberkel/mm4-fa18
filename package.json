@@ -15,7 +15,8 @@
     "world": "node tools/build-world.mjs",
     "audio": "node tools/render-audio.mjs",
     "verify:display": "node tools/verify-display.mjs",
-    "verify:music": "node tools/verify-music.mjs"
+    "verify:music": "node tools/verify-music.mjs",
+    "verify:touch": "node tools/verify-touch.mjs"
   },
   "devDependencies": {
     "d3-contour": "^4.0.2",

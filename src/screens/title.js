@@ -174,6 +174,7 @@ const BUILDERS = [sceneFlyby, sceneOrbit, sceneGate, sceneFight, sceneCarrier, s
 export class TitleScreen {
   constructor(game) {
     this.game = game;
+    this.touchUI = 'tap';
     this.t = 0;
     this.sceneIdx = -1;
     this.sceneT = 0;
