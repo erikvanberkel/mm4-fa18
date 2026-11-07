@@ -1,0 +1,28 @@
+{
+  "name": "fa18-interceptor-remake",
+  "version": "1.0.0",
+  "description": "A from-scratch remake of the 1988 Amiga flight sim F/A-18 Interceptor: software rendered 3D over the real San Francisco Bay, with an emulated Amiga Paula sound chip.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node tools/dev.mjs",
+    "start": "node tools/dev.mjs",
+    "build": "node tools/build.mjs",
+    "test": "node --test test/",
+    "world": "node tools/build-world.mjs",
+    "audio": "node tools/render-audio.mjs",
+    "verify:display": "node tools/verify-display.mjs",
+    "verify:music": "node tools/verify-music.mjs"
+  },
+  "devDependencies": {
+    "d3-contour": "^4.0.2",
+    "earcut": "^3.0.2",
+    "esbuild": "^0.28.2",
+    "pngjs": "^7.0.0",
+    "polygon-clipping": "^0.15.7",
+    "simplify-js": "^1.2.4"
+  }
+}
